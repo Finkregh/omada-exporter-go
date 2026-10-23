@@ -24,6 +24,12 @@ func Get(devices []Devices.Device) (*[]Switch, error) {
 			return nil, Log.Error(err, "Failed to get OpenAPI data for switch %s", d.MacAddress)
 		}
 
+		// getOpenApiData also reports a nil result when the controller
+		// returned no data; dereferencing that below would panic.
+		if openApiResult == nil || len(*openApiResult) == 0 {
+			continue
+		}
+
 		webApiResult, err := getWebApiData(d)
 		if err != nil {
 			Log.Error(err, "Failed to get WebAPI data for switch %s", d.MacAddress)
@@ -57,12 +63,22 @@ func Get(devices []Devices.Device) (*[]Switch, error) {
 func getOpenApiData(d Devices.Device) (*[]Switch, error) {
 	client := ApiClient.GetInstance()
 
-	result, err := ApiClient.Get[Switch](client, path_OpenApiSwitch, map[string]string{"switchMac": d.MacAddress}, nil, false)
+	// Agile Series ("Easy Managed", model prefix ES) switches are only
+	// served by the dedicated /switches/es/{switchMac} endpoint; the generic
+	// one answers errorCode -39742. The device list reports the series in
+	// `subtype` ("es" for Agile Series).
+	path := path_OpenApiSwitch
+	isEasyManaged := d.Subtype == "es"
+	if isEasyManaged {
+		path = path_OpenApiEasyManagedSwitch
+	}
+
+	result, err := ApiClient.Get[Switch](client, path, map[string]string{"switchMac": d.MacAddress}, nil, false)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(*result) == 0 {
+	if result == nil || len(*result) == 0 {
 		Log.Warn("No OpenAPI data found for switch %s", d.MacAddress)
 		return nil, nil
 	}
@@ -71,6 +87,13 @@ func getOpenApiData(d Devices.Device) (*[]Switch, error) {
 	(*result)[0].DeviceType = Enum.DeviceType_Switch
 	(*result)[0].Name = d.Name
 	(*result)[0].LastSeen = d.LastSeen
+
+	// The Agile Series overview omits cpuUtil/memUtil; the device list still
+	// carries them, so use those instead of reporting 0%.
+	if isEasyManaged {
+		(*result)[0].CpuUsage = d.CpuUsage
+		(*result)[0].RamUsage = d.RamUsage
+	}
 
 	return result, nil
 }
