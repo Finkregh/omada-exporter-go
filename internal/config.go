@@ -18,6 +18,8 @@ type Config struct {
 	}
 	Prometheus struct {
 		MetricsPath string `env:"METRICS_PATH" envDefault:"/metrics"`
+		// MetricsHost is the listen address. Empty means all interfaces.
+		MetricsHost string `env:"METRICS_HOST" envDefault:""`
 		MetricsPort string `env:"METRICS_PORT" envDefault:"8080"`
 	}
 	Loki struct {

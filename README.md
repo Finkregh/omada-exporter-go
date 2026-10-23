@@ -119,6 +119,9 @@ All configuration values are read from environment variables. These can be provi
 | `OMADA_CLIENT_SECRET` | OpenAPI Client Secret                                                  | -       |
 | `OMADA_USERNAME`      | Username for Web API access                                            | -       |
 | `OMADA_PASSWORD`      | Password for Web API access                                            | -       |
+| `METRICS_PATH`        | HTTP path the metrics are served on                                    | `/metrics` |
+| `METRICS_HOST`        | Address the metrics server binds to (empty = all interfaces)           | -       |
+| `METRICS_PORT`        | Port the metrics server binds to                                       | `8080`  |
 
 ## Tested on devices:
 
