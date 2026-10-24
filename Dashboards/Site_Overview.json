@@ -748,8 +748,8 @@
                     },
                     {
                         "matcher": {
-                            "id": "byName",
-                            "options": "Last Seen"
+                            "id": "byRegexp",
+                            "options": "/Last[_ ]Seen/"
                         },
                         "properties": [
                             {
@@ -910,7 +910,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "device_last_seen{job=\"$job_name\"}",
+                    "expr": "device_last_seen{job=\"$job_name\"} * 1000",
                     "format": "table",
                     "hide": false,
                     "instant": true,
