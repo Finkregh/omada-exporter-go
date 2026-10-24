@@ -8,7 +8,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 
+	"omada_exporter_go/internal"
+	"omada_exporter_go/internal/Log"
 	"omada_exporter_go/internal/Omada/Model/AccessPoint"
+	"omada_exporter_go/internal/Omada/Model/Clients"
 	"omada_exporter_go/internal/Omada/Model/Devices"
 	"omada_exporter_go/internal/Omada/Model/Gateway"
 	"omada_exporter_go/internal/Omada/Model/Interface"
@@ -76,6 +79,10 @@ func CollectMetrics() error {
 		}
 	}
 
+	// Client statistics are opt-in, so the extra request is only made when the
+	// operator asked for it.
+	collectClientMetrics(internal.GetConfig().Prometheus.EnableClientMetrics)
+
 	omada_scrape_duration.Set(time.Since(start).Seconds())
 
 	ExposeDeviceMetrics(omadaDevices)
@@ -83,4 +90,29 @@ func CollectMetrics() error {
 	ExposeRadioMetrics(omadaDevices)
 
 	return errors.Join(errs...)
+}
+
+// getClients is the collector's client source. It is a variable so the gating
+// test can prove that a disabled ENABLE_CLIENT_METRICS never touches the
+// clients endpoint, without a controller.
+var getClients = Clients.Get
+
+// collectClientMetrics fetches and exposes the optional per-client series. The
+// enabled flag is passed in rather than read from the config so the scrape path
+// and its tests can exercise the disabled branch without a config singleton.
+func collectClientMetrics(enabled bool) {
+	if !enabled {
+		return
+	}
+
+	clients, err := getClients()
+	if err != nil {
+		// Client statistics are an optional extra: a failing request must not
+		// cost the device, port and radio metrics of this scrape, so it is
+		// logged and skipped instead of returned.
+		Log.Warn("Failed to get clients, this scrape reports no client metrics: %s", err)
+		return
+	}
+
+	ExposeClientMetrics(*clients)
 }

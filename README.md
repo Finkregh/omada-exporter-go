@@ -110,18 +110,19 @@ scrape_configs:
 
 All configuration values are read from environment variables. These can be provided via a .env file, environment variables in your system, or directly in Docker Compose.
 
-| Variable              | Description                                                            | Default |
-| --------------------- | ---------------------------------------------------------------------- | ------- |
-| `LOG_LEVEL`           | Logging verbosity level (_debug_, _info_, _warn_, _error_)             | `error` |
-| `OMADA_URL`           | Full base URL to the Omada controller (e.g., https://192.168.1.1:8043) | -       |
-| `OMADA_SITE_NAME`     | Name of the site you wish to monitor                                   | -       |
-| `OMADA_CLIENT_ID`     | OpenAPI Client ID created in Omada Platform Integration                | -       |
-| `OMADA_CLIENT_SECRET` | OpenAPI Client Secret                                                  | -       |
-| `OMADA_USERNAME`      | Username for Web API access                                            | -       |
-| `OMADA_PASSWORD`      | Password for Web API access                                            | -       |
-| `METRICS_PATH`        | HTTP path the metrics are served on                                    | `/metrics` |
-| `METRICS_HOST`        | Address the metrics server binds to (empty = all interfaces)           | -       |
-| `METRICS_PORT`        | Port the metrics server binds to                                       | `8080`  |
+| Variable                | Description                                                                                            | Default    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | ---------- |
+| `LOG_LEVEL`             | Logging verbosity level (_debug_, _info_, _warn_, _error_)                                             | `error`    |
+| `OMADA_URL`             | Full base URL to the Omada controller (e.g., https://192.168.1.1:8043)                                 | -          |
+| `OMADA_SITE_NAME`       | Name of the site you wish to monitor                                                                   | -          |
+| `OMADA_CLIENT_ID`       | OpenAPI Client ID created in Omada Platform Integration                                                | -          |
+| `OMADA_CLIENT_SECRET`   | OpenAPI Client Secret                                                                                  | -          |
+| `OMADA_USERNAME`        | Username for Web API access                                                                            | -          |
+| `OMADA_PASSWORD`        | Password for Web API access                                                                            | -          |
+| `METRICS_PATH`          | HTTP path the metrics are served on                                                                    | `/metrics` |
+| `METRICS_HOST`          | Address the metrics server binds to (empty = all interfaces)                                           | -          |
+| `METRICS_PORT`          | Port the metrics server binds to                                                                       | `8080`     |
+| `ENABLE_CLIENT_METRICS` | Expose per-client statistics: one extra API request per scrape and one series set per connected client | `false`    |
 
 ## Tested on devices:
 
