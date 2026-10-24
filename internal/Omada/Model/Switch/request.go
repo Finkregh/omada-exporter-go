@@ -55,9 +55,34 @@ func Get(devices []Devices.Device) (*[]Switch, error) {
 
 	}
 
+	// The PoE report is site-wide (one row per port of every switch), so it is
+	// requested once per scrape instead of once per switch. It only decorates
+	// the ports: a failing request must never cost the switch and port metrics,
+	// which is why it is logged and skipped rather than returned.
+	poePorts, err := getPoeInfo()
+	if err != nil {
+		Log.Warn("Failed to get PoE port data, ports will report as PoE unsupported: %s", err)
+	} else {
+		mergePoeInfo(allDataOpenApi, poePorts)
+	}
+
 	Log.Debug("Fetched %d switches", len(allDataOpenApi))
 
 	return &allDataOpenApi, nil
+}
+
+func getPoeInfo() ([]openApiSwitchPoePort, error) {
+	client := ApiClient.GetInstance()
+
+	result, err := ApiClient.Get[openApiSwitchPoePort](client, path_OpenApiSwitchPoe, nil, nil, true)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		return nil, nil
+	}
+
+	return *result, nil
 }
 
 func getOpenApiData(d Devices.Device) (*[]Switch, error) {

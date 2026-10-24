@@ -17,6 +17,7 @@ type fakeDevice struct {
 	deviceType string
 	macAddress string
 	lastSeen   float64
+	ports      []Interface.Port
 }
 
 func (d fakeDevice) GetType() string                 { return d.deviceType }
@@ -32,7 +33,7 @@ func (d fakeDevice) GetTemperature() float64         { return -1 }
 func (d fakeDevice) GetLastSeen() float64            { return d.lastSeen }
 func (d fakeDevice) GetClientsCount() float64        { return 3 }
 func (d fakeDevice) GetUpgradeNeededStatus() float64 { return 0 }
-func (d fakeDevice) GetPorts() []Interface.Port      { return nil }
+func (d fakeDevice) GetPorts() []Interface.Port      { return d.ports }
 func (d fakeDevice) GetRadios() []Interface.Radio    { return nil }
 
 // gatherLastSeen returns the gathered device_last_seen family plus the sample
